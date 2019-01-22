@@ -10,18 +10,23 @@ from sklearn.decomposition import PCA
 
 
 # Load the boston dataset.
-data = data_source.mnist_data()[0]
-dim = data['train_inputs'].shape[1]
+dataS = data_source.mnist_data()[0]
+dim = dataS['train_inputs'].shape[1]
 
 data_pca = {}
 comp_dims = 50
 
 print("compressed with PCA")
 pca = PCA(comp_dims)
-pca.fit(data["train_inputs"])
-data["train_inputs"] = pca.transform(data["train_inputs"])
-data["test_inputs"] = pca.transform(data["test_inputs"])
+pca.fit(dataS["train_inputs"])
+data_pca["train_inputs"] = pca.transform(dataS["train_inputs"])
+data_pca["test_inputs"] = pca.transform(dataS["test_inputs"])
+data_pca["train_outputs"] = np.argmax(dataS["train_outputs"], axis=1).reshape(-1,1)
+data_pca["test_inputs"] = np.argmax(dataS["test_inputs"], axis=1).reshape(-1,1)
 
+
+
+data = data_pca
 
 # print(dim)
 # data = data_source.boston_data()[0]
@@ -81,7 +86,9 @@ test_outputs = data['test_outputs']
 #                 ((test_outputs.mean() - test_outputs) ** 2).mean()))
 
 # Print the accuracy
-train_acc = accuracy_score(np.argmax(train_pred, axis=1), np.argmax(data["train_outputs"], axis=1))
-dev_acc = accuracy_score(np.argmax(test_outputs, axis=1), np.argmax(predicted_mean, axis=1))
+train_acc = accuracy_score(np.argmax(train_pred, axis=1), data["train_outputs"])
+# train_acc = accuracy_score(np.argmax(train_pred, axis=1), np.argmax(data["train_outputs"], axis=1))
+# dev_acc = accuracy_score(np.argmax(test_outputs, axis=1), np.argmax(predicted_mean, axis=1))
+dev_acc = accuracy_score(test_outputs, np.argmax(predicted_mean, axis=1))
 print(f"the accuracy in the training set is {train_acc * 100}%")
 print(f"the accuracy in dev set is {dev_acc * 100}%")
