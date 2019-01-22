@@ -6,11 +6,23 @@ from savigp.kernel import ExtRBF
 from savigp.likelihood import UnivariateGaussian, SoftmaxLL
 from savigp import Savigp
 from sklearn.metrics import accuracy_score
+from sklearn.decomposition import PCA
 
 
 # Load the boston dataset.
 data = data_source.mnist_data()[0]
 dim = data['train_inputs'].shape[1]
+
+data_pca = {}
+comp_dims = 50
+
+print("compressed with PCA")
+pca = PCA(comp_dims)
+pca.fit(data["train_inputs"])
+data["train_inputs"] = pca.transform(data["train_inputs"])
+data["test_inputs"] = pca.transform(data["test_inputs"])
+
+
 # print(dim)
 # data = data_source.boston_data()[0]
 # print(data['test_outputs'])
@@ -30,6 +42,7 @@ kernel = [ExtRBF(data['train_inputs'].shape[1],
                  ARD=False)]
 
 # Set the number of inducing points to be half of the training data.
+# num_inducing = int(0.5 * data['train_inputs'].shape[0])
 num_inducing = int(0.5 * data['train_inputs'].shape[0])
 
 # Transform the data before training.
@@ -68,7 +81,7 @@ test_outputs = data['test_outputs']
 #                 ((test_outputs.mean() - test_outputs) ** 2).mean()))
 
 # Print the accuracy
-# print(pre)
+train_acc = accuracy_score(np.argmax(train_pred, axis=1), np.argmax(data["train_outputs"], axis=1))
 dev_acc = accuracy_score(np.argmax(test_outputs, axis=1), np.argmax(predicted_mean, axis=1))
-# dev_acc = 
+print(f"the accuracy in the training set is {train_acc * 100}%")
 print(f"the accuracy in dev set is {dev_acc * 100}%")
