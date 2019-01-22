@@ -9,6 +9,7 @@ from scipy.linalg import det, inv
 from scipy.misc import logsumexp
 #from scipy.special._ufuncs import gammaln
 from scipy.special import erfinv, gammaln
+import torch
 
 from . import util
 from .util import cross_ent_normal
@@ -335,7 +336,9 @@ class SoftmaxLL(Likelihood):
     @util.torchify
     def _torch_ll_F_Y(self, F, Y):
         inner_val = F - torch.sum(F * Y, dim=2)[:, :, np.newaxis]
-        max_val = torch.max(inner_val, dim=2)
+        a = inner_val.size()
+        max_val = torch.max(inner_val, dim=2)[0]
+        # max_val_new = max_val[:, :, np.newaxis]
         result = -(torch.log(torch.sum(torch.exp(inner_val - max_val[:, :, np.newaxis]), dim=2)) + max_val)
         return result
 
