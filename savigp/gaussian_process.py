@@ -322,7 +322,7 @@ class GaussianProcess(object):
             provided. Dimensions: num_test
         """
         # TODO(karl): Make this nicer.
-        num_partitions = (self.num_data_points + self.partition_size - 1) / self.partition_size
+        num_partitions = (self.num_data_points + self.partition_size - 1) // self.partition_size
         test_inputs = test_inputs.astype(util.PRECISION)
         input_partitions = np.array_split(test_inputs, num_partitions)
         if test_outputs is not None:
@@ -1425,7 +1425,7 @@ class GaussianProcess(object):
             kern_dot_covar_dot_kern = self.gaussian_mixture.a_dot_covar_dot_a(kernel_products[i],
                                                                               component_index, i)
             normal_samples[i], sample_means[i], sample_vars[i], samples[:, :, i] = (
-                self._torch_get_samples_partition(kernel_products[i],
+                self._torch_get_samples_partition(kernel_products[i], 
                                          diag_conditional_covars[i],
                                          kern_dot_covar_dot_kern,
                                          self.gaussian_mixture.means[component_index, i],

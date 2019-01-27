@@ -3,25 +3,36 @@ import numpy as np
 from experiments import data_source
 from experiments import data_transformation
 from savigp.kernel import ExtRBF
-from savigp.likelihood import UnivariateGaussian, SoftmaxLL
+from savigp.likelihood import UnivariateGaussian
 from savigp import Savigp
+
+
+# define an automatic obtain kernel function.
+def get_kernels(input_dim, num_latent_proc, variance = 1, lengthscale = None, ARD = False):
+    return [ExtRBF(
+                input_dim, variance = variance, 
+                lengthscale=np.array((1.,)) if lengthscale is None else lengthscale, 
+                ARD=ARD
+            )
+            for _ in range(num_latent_proc)]
 
 
 # Load the boston dataset.
 # data = data_source.mnist_data()[0]
 data = data_source.boston_data()[0]
+# print(data["train_inputs"][0])
+# print(data["train_outputs"][0])
 # print(data['test_outputs'])
-
 
 # Define a univariate Gaussian likelihood function with a variance of 1.
 likelihood = UnivariateGaussian(np.array([1.0]))
-# likelihood = 
 
 # Define a radial basis kernel with a variance of 1, lengthscale of 1 and ARD disabled.
-kernel = [ExtRBF(data['train_inputs'].shape[1],
-                 variance=1.0,
-                 lengthscale=np.array([1.0]),
-                 ARD=False)]
+kernel = get_kernels(data['train_inputs'].shape[1], 1, ARD = True)
+# kernel = [ExtRBF(data['train_inputs'].shape[1],
+#                  variance=1.0,
+#                  lengthscale=np.array([1.0]),
+#                  ARD=False)]
 
 # Set the number of inducing points to be half of the training data.
 num_inducing = int(0.5 * data['train_inputs'].shape[0])
@@ -35,11 +46,14 @@ test_inputs = transform.transform_X(data['test_inputs'])
 # Initialize the model.
 gp = Savigp(likelihood=likelihood,
             kernels=kernel,
+            random_inducing=True,
             num_inducing=num_inducing,
             debug_output=True)
 
 # Now fit the model to our training data.
-gp.fit(train_inputs, train_outputs)
+gp.fit(train_inputs, train_outputs, 
+        optimize_stochastic = False, 
+        optimization_config={'mog': 25, 'hyp': 25, 'll': 25, 'inducing': 8})
 
 # Make predictions. The third output is NLPD which is set to None unless test outputs are also
 # provided.

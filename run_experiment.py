@@ -45,11 +45,11 @@ def main():
         experiment = EXPERIMENTS[args['experiment_name']]
         del args['experiment_name']
         if args['method'] == 'full' and args['components'] != 1:
-            print 'Only one components allowed for full Gaussian posterior.'
+            print('Only one components allowed for full Gaussian posterior.')
         else:
             experiment(**args)
     else:
-        print 'You must either chose an experiment (-e) or a config file (-f).'
+        print('You must either chose an experiment (-e) or a config file (-f).')
 
 
 def setup_args():

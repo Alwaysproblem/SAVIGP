@@ -351,7 +351,7 @@ class SoftmaxLL(Likelihood):
         lpd = None
         if not (Ys is None):
             lpd = np.log((Ys * mean).sum(axis=1))
-        return mean, None, lpd[:, np.newaxis]
+        return mean, None, lpd[:, np.newaxis] if lpd is not None else None
 
 
     def set_params(self, p):

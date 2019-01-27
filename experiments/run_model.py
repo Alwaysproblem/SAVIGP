@@ -1,7 +1,7 @@
 """
 Provides facility for fitting models to data, making predictions and exporting results to csv files.
 """
-import cPickle
+import _pickle as cPickle
 import os
 
 import numpy as np
@@ -168,13 +168,13 @@ def run_model(train_inputs,
                                         num_threads=n_threads,
                                         partition_size=partition_size)
     else:
-        assert False
+        assert(False)
 
     def cb():
         pred_y, _, _ = model.predict(test_inputs, test_outputs)
         pred_y = transformer.untransform_Y(pred_y)
         t_out = transformer.untransform_Y(test_outputs)
-        print "MSSE", ((pred_y - t_out) ** 2).mean() / ((t_out - t_out.mean(0)) ** 2).mean()
+        print("MSSE", ((pred_y - t_out) ** 2).mean() / ((t_out - t_out.mean(0)) ** 2).mean())
     optimizer.callback = cb 
     # Optimize the model.
     if optimize_stochastic:
