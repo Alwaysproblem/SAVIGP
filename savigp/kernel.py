@@ -58,7 +58,7 @@ class ExtRBF(RBF):
         return np.hstack((variance_gradient[:, np.newaxis], lengthscale_gradient)).astype(util.PRECISION)
 
     @util.torchify
-    def _torch_get_gradients_AK_ARD(self, X, X2, A, kernel, kd_dr, inv_dist, lengthscale, variance):
+    def _torch_get_gradients_AK_ARD(self, X, X2, A, kernel, dk_dr, inv_dist, lengthscale, variance):
         tmp = dk_dr * A * inv_dist
         variance_gradient = torch.sum(kernel * A, dim=1) / variance
         lengthscale_gradient = -(torch.sum(
@@ -213,8 +213,14 @@ class ExtRBF(RBF):
         x_xl3 = ((diff ** 2) * (inv_dist * dk_dr)[:, :, np.newaxis]).transpose(0, 1)
 
         variance_gradient = S.mm(kernel).mm(D) / variance
-        lengthscale_gradient = -(torch.sum(D.t()[:, :, np.newaxis] * S.mm(x_xl3), dim=1) /
-                                 length_scale ** 3)
+        # lengthscale_gradient = -(torch.sum(D.t()[:, :, np.newaxis] * S.mm(x_xl3), dim=1) /
+        #                          length_scale ** 3)
+
+        tensordot_S_x_xl3 = torch.mm(S, x_xl3.contiguous().view(x_xl3.size()[0], -1))\
+                                    .view(S.size()[0], x_xl3.size()[1], x_xl3.size()[-1])
+
+        lengthscale_gradient = -(torch.sum(D.t()[:, :, np.newaxis] * tensordot_S_x_xl3, dim=1) /
+                                    length_scale ** 3)
 
         return variance_gradient, lengthscale_gradient
 
