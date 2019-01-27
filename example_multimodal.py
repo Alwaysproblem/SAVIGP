@@ -2,7 +2,6 @@
 Example of a multimodal posterior
 """
 
-
 import numpy as np
 from savigp.kernel import ExtRBF
 from savigp.likelihood import UnivariateGaussian
@@ -51,7 +50,7 @@ elif posterior == "diag":
                                  kernel, likelihood, latent_noise=latent_noise, exact_ell=False,
                                  partition_size=X.shape[0])
 else:
-    assert False
+    assert(False)
 
 # Now fit the model to our training data.
 optimization_config = {'mog': 50, 'hyp': 15, 'll': 15}
