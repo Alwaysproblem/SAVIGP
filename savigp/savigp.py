@@ -82,6 +82,7 @@ class Savigp(object):
             optimize_stochastic=True,
             param_threshold=1e-3,
             objective_threshold=5,
+            num_threads=1,
             max_iterations=200):
         """
         train_inputs : ndarray
@@ -117,7 +118,7 @@ class Savigp(object):
                                              self.latent_noise,
                                              False,
                                              self.random_inducing,
-                                             num_threads=1,
+                                             num_threads=num_threads,
                                              partition_size=self.partition_size)
         elif self.posterior == 'diag':
             self.model = DiagonalGaussianProcess(train_inputs,
@@ -130,7 +131,7 @@ class Savigp(object):
                                                  self.latent_noise,
                                                  False,
                                                  self.random_inducing,
-                                                 num_threads=1,
+                                                 num_threads=num_threads,
                                                  partition_size=self.partition_size)
         else:
             assert(False)
