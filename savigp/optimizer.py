@@ -136,7 +136,10 @@ class BatchModelWrapper(object):
 
     def objective_function(self, new_params):
         self.update(new_params)
-        model_logging.logger.debug('Objective: %.4f', self._model.objective_function())
+        # model_logging.logger.debug('Objective: %.4f', self._model.objective_function())
+        model_logging.logger.debug('Neg ELBO: %.4f - Neg KL: %.4f - Neg ELL: %.4f', self._model.objective_function(),
+                                   -(self._model.cached_entropy + self._model.cached_cross),
+                                   -self._model.cached_ell)
         return self._model.objective_function().astype(np.float64)
 
     def objective_function_gradients(self, new_params):
@@ -211,12 +214,14 @@ def stochastic_optimize_model(model, optimization_config, max_iterations=200, mo
         model_logging.logger.info('Last objective value: %f', model.overall_objective_function())
 
     end = time.time()
-    return (end - start), total_evaluations 
+    return (end - start), total_evaluations
+
 grad_rms = [0] * 10
 change_rms = [0] * 10
 m_t = [0] * 10
 v_t = [0] * 10
 t = [0] * 10
+
 def sgd(model, num_batches, max_passes, idx):
     """
     Optimise the model using mini-batch stochastic gradient descent.

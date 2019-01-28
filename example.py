@@ -52,6 +52,7 @@ gp = Savigp(likelihood=likelihood,
 
 # Now fit the model to our training data.
 gp.fit(train_inputs, train_outputs, 
+        # num_threads=4,
         optimize_stochastic = False, 
         optimization_config={'mog': 25, 'hyp': 25, 'll': 25, 'inducing': 8})
 
@@ -65,5 +66,8 @@ predicted_var = transform.untransform_Y_var(predicted_var)
 
 # Print the mean standardized squared error.
 test_outputs = data['test_outputs']
-print("MSSE:", (((predicted_mean - test_outputs) ** 2).mean() /
-                ((test_outputs.mean() - test_outputs) ** 2).mean()))
+
+print("Root Mean Square Error:", np.sqrt(((predicted_mean - test_outputs)**2).mean()))
+print("Mean Standardized Error:", ((predicted_mean - test_outputs) / predicted_var).mean())
+print("Root Mean Square Standardized Error:", np.sqrt(((predicted_mean - test_outputs) ** 2).mean() /
+                                                        ((test_outputs.mean() - test_outputs) ** 2).mean()))

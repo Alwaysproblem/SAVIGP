@@ -60,13 +60,13 @@ print("define a kernel")
 #                  lengthscale=np.array([1.0]),
 #                  ARD=False)]
 
-kernel = get_kernels(data["train_inputs"].shape[1], dim, variance=11, lengthscale=np.array((9.,)))
+kernel = get_kernels(data["train_inputs"].shape[1], dim, variance=5, lengthscale=np.array((5.,)))
 # kernel = [ExtRBF(data['train_inputs'].shape[1], variance=11, lengthscale=np.array((9.,)), ARD=False)
 #             for _ in range(10)]
 
 # Set the number of inducing points to be half of the training data.
 # num_inducing = int(0.5 * data['train_inputs'].shape[0])
-num_inducing = int(0.007 * data['train_inputs'].shape[0])
+num_inducing = int(0.04 * data['train_inputs'].shape[0])
 
 # Transform the data before training.
 print("data transformation")
@@ -79,11 +79,11 @@ test_inputs = transform.transform_X(data['test_inputs'])
 # Initialize the model.
 print("initialize the model")
 gp = Savigp(
-            
             likelihood=likelihood,
             kernels=kernel,
             num_inducing=num_inducing,
-            random_inducing=True,
+            # random_inducing=True,
+            partition_size=3000,
             debug_output=True
         )
 
@@ -92,7 +92,7 @@ print("fitting")
 gp.fit(
         train_inputs, 
         train_outputs, 
-        optimization_config={'hyp': 15}, 
+        optimization_config={'hyp': 15, "mog": 60, "inducing": 15},
         max_iterations=300, 
         optimize_stochastic=False
     )

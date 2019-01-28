@@ -95,8 +95,8 @@ def KL_normal(m1, sigma1, m2, sigma2):
     N(``mu1``, ``sigma1``), N(``mu2``, ``sigma2``)
     """
 
-    return 1. / 2. * (math.log(det(sigma2) / det(sigma1)) - len(m1) + trace(mdot(inv(sigma2), sigma1)) + \
-    mdot((m2 - m1).T, inv(sigma2) , m2- m1))
+    return 1 / 2 * (math.log(det(sigma2) / det(sigma1)) - len(m1) + trace(mdot(inv(sigma2), sigma1)) + \
+            mdot((m2 - m1).T, inv(sigma2) , m2- m1))
 
 
 def cross_ent_normal(m1, sigma1, m2, sigma2):
@@ -105,7 +105,7 @@ def cross_ent_normal(m1, sigma1, m2, sigma2):
     N(``mu1``, ``sigma1``), N(``mu2``, ``sigma2``)
     """
 
-    return -KL_normal(m1, sigma1, m2, sigma2) - 1. / 2 * math.log(det(2.0 * math.pi * math.e * sigma1))
+    return -KL_normal(m1, sigma1, m2, sigma2) - 1 / 2 * math.log(det(2 * math.pi * math.e * sigma1))
 
 
 def jitchol(A, maxtries=5):
@@ -170,8 +170,8 @@ def log_diag_gaussian(m1, m2, s_log):
 
     N(m1| m2, exp(s_log)), where the covariance matrix is diagonal
     """
-    const = -1.0 / 2 * s_log.sum() - float(len(s_log)) / 2 * np.log(2 * math.pi)
-    return const + -1.0 / 2 * np.dot((m1 - m2) / np.exp(s_log), (m1-m2).T)
+    const = -1 / 2 * s_log.sum() - float(len(s_log)) / 2 * np.log(2 * math.pi)
+    return const + -1 / 2 * np.dot((m1 - m2) / np.exp(s_log), (m1-m2).T)
 
 
 class bcolors:
@@ -243,10 +243,6 @@ def drange(start, stop, step):
     while r < stop:
         yield r
         r += step
-
-
-# class JitChol(Exception):
-#     pass
 
 class JitChol(Exception):
     def __init__(self, message):
