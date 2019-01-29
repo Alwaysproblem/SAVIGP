@@ -12,7 +12,7 @@ from sklearn.decomposition import PCA
 def get_kernels(input_dim, num_latent_proc, variance = 1, lengthscale = None, ARD = False):
     return [ExtRBF(
                 input_dim, variance = variance, 
-                lengthscale=np.array((1.,)) if lengthscale is None else lengthscale, 
+                lengthscale=np.array((1.,)) if lengthscale is None else lengthscale,
                 ARD=ARD
             )
             for _ in range(num_latent_proc)]
@@ -20,7 +20,6 @@ def get_kernels(input_dim, num_latent_proc, variance = 1, lengthscale = None, AR
 # Load the boston dataset.
 dataS = data_source.mnist_data()[0]
 dim = dataS['train_outputs'].shape[1]
-# dim = 1
 
 data_pca = {}
 comp_dims = 20
@@ -35,8 +34,6 @@ data_pca["test_outputs"] = dataS["test_outputs"]
 # data_pca["train_outputs"] = np.argmax(dataS["train_outputs"], axis=1).reshape(-1,1)
 # data_pca["test_outputs"] = np.argmax(dataS["test_outputs"], axis=1).reshape(-1,1)
 
-
-
 data = data_pca
 
 print(data["train_inputs"][0])
@@ -47,30 +44,22 @@ print(data["train_outputs"][0])
 # print(data['test_outputs'])
 # print(np.argmax(data['test_outputs'], axis = 1))
 
+SF = 0.01
 
 # Define a univariate Gaussian likelihood function with a variance of 1.
 print("Define the softmax likelihood.")
 # likelihood = UnivariateGaussian(np.array([1.0]))
 likelihood = SoftmaxLL(dim)
 
-# Define a radial basis kernel with a variance of 1, lengthscale of 1 and ARD disabled.
-print("define a kernel")
-# kernel = [ExtRBF(data['train_inputs'].shape[1],
-#                  variance=1.0,
-#                  lengthscale=np.array([1.0]),
-#                  ARD=False)]
-
-kernel = get_kernels(data["train_inputs"].shape[1], dim, variance=5, lengthscale=np.array((5.,)))
-# kernel = [ExtRBF(data['train_inputs'].shape[1], variance=11, lengthscale=np.array((9.,)), ARD=False)
-#             for _ in range(10)]
+# Define a radial basis kernel with a variance of 5, lengthscale of  and ARD disabled.
+print("Define a kernel")
+kernel = get_kernels(data["train_inputs"].shape[1], dim, variance=5, lengthscale=np.array((2.,)))
 
 # Set the number of inducing points to be half of the training data.
-# num_inducing = int(0.5 * data['train_inputs'].shape[0])
-num_inducing = int(0.04 * data['train_inputs'].shape[0])
+num_inducing = int(SF * data['train_inputs'].shape[0])
 
 # Transform the data before training.
 print("data transformation")
-# transform = data_transformation.MeanTransformation(data['train_inputs'], data['train_outputs'])
 transform = data_transformation.IdentityTransformation(data['train_inputs'], data['train_outputs'])
 train_inputs = transform.transform_X(data['train_inputs'])
 train_outputs = transform.transform_Y(data['train_outputs'])
@@ -90,10 +79,11 @@ gp = Savigp(
 # Now fit the model to our training data.
 print("fitting")
 gp.fit(
-        train_inputs, 
-        train_outputs, 
+        train_inputs,
+        train_outputs,
+        num_threads=6,
         optimization_config={'hyp': 15, "mog": 60, "inducing": 15},
-        max_iterations=300, 
+        max_iterations=300,
         optimize_stochastic=False
     )
 
@@ -109,10 +99,7 @@ predicted_mean = transform.untransform_Y(predicted_mean)
 train_pred = transform.untransform_Y(train_pred)
 # predicted_var = transform.untransform_Y_var(predicted_var)
 
-# Print the mean standardized squared error.
 test_outputs = data['test_outputs']
-# print("MSSE:", (((predicted_mean - test_outputs) ** 2).mean() /
-#                 ((test_outputs.mean() - test_outputs) ** 2).mean()))
 
 # Print the accuracy
 # train_acc = accuracy_score(np.argmax(train_pred, axis=1), data["train_outputs"])
