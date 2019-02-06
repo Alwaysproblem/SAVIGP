@@ -6,18 +6,28 @@
 # from savigp.optimizer import batch_optimize_model
 # from savigp import model_logging
 
+from savigp.DataTransformation import OneHotYTransformation
+import numpy as np
 
-re = []
+y = np.array([[1], [2]])
 
-# def fun(arg):
-#     a, b = arg
-#     print(a, b)
-#     re.append(a+b)
-#     # return a+b
+trans = OneHotYTransformation(None, y, 3)
+Y = trans.transform_Y(y)
 
-# a = list(map(fun, [(1,2), (3,4), (5,6)]))
+print(Y)
 
-a = map(sum, [(1,2)])
 
-print a
-# print(re)
+# re = []
+
+# # def fun(arg):
+# #     a, b = arg
+# #     print(a, b)
+# #     re.append(a+b)
+# #     # return a+b
+
+# # a = list(map(fun, [(1,2), (3,4), (5,6)]))
+
+# a = map(sum, [(1,2)])
+
+# print a
+# # print(re)
