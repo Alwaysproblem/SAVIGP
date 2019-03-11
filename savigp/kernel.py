@@ -5,16 +5,27 @@ from GPy.util.linalg import mdot
 
 from . import util
 
-
 # define an automatic obtain kernel function.
 def get_ExtRBF_kernels(input_dim, num_latent_proc, variance = 1, lengthscale = None, ARD = False):
+    """
+    setting the ExtRBF Kernels through data dimention.
+
+    args:
+        input_dim: the dimention of input data.
+        num_latent_proc: the class number.
+        variance: define variance of kernels.
+        lengthscale: define lengthscale of kernels.
+        ARD: Automatic Relevance Determination.
+
+    return:
+        a list of ExtRBF.
+    """
     return [ExtRBF(
                 input_dim, variance = variance, 
                 lengthscale=np.array((1.,)) if lengthscale is None else lengthscale,
                 ARD=ARD
             )
             for _ in range(num_latent_proc)]
-
 
 class ExtRBF(RBF):
     """
